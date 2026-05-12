@@ -18,8 +18,9 @@ This skill bootstraps a new project with a structured, agent-driven workflow.
 A fully structured project with:
 
 - `AGENTS.md` and `CLAUDE.md` (symlinked) - the constitution
-- `.claude/agents/` - four specialized agents (orchestrator, spec-writer, implementer, reviewer)
-- `.claude/hooks/quality-gate.sh` - deterministic QA hook
+- `.claude/skills/tdd/` - the `/tdd` skill: full TDD pipeline in the main context
+- `.claude/agents/` - three focused subagents (test-spec-writer, implementer, code-reviewer)
+- `.claude/hooks/quality-gate.sh` - deterministic QA hook triggered by code-reviewer
 - `docs/` - living documentation (structure, requirements, gotchas, backlog, current-task)
 - `.devcontainer/` - portable development environment (if chosen)
 - `scripts/qa.sh` - bundled quality checks for the chosen stack

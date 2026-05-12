@@ -59,16 +59,17 @@ Do not skip these. The system gets better only if these living docs stay current
 </self-improvement>
 
 <agent-roster>
-This project uses four specialized agents, defined in `.claude/agents/`:
+For any non-trivial task, invoke the `/tdd` skill. It runs the full pipeline in the current context and delegates to subagents only where it makes sense.
 
-- `@tdd-orchestrator` - coordinates the workflow. Delegates to other agents. Never writes code itself.
-- `@test-spec-writer` - turns requirements into failing tests.
-- `@implementer` - writes minimal code to pass tests. Refactors after green.
-- `@code-reviewer` - runs the QA gate. Pushes back on quality, security, or design issues.
+**Skill:**
+- `/tdd` — full TDD pipeline: explore → spec → implement → refactor → review. Stays in main context.
 
-For any non-trivial task (new feature, significant bug fix, refactor), the orchestrator handles delegation. For trivial tasks (typo fix, doc tweak), the main agent does the work directly.
+**Subagents** (called by the skill for complex phases, or directly for ad-hoc work):
+- `@test-spec-writer` — writes failing tests for a given requirement.
+- `@implementer` — makes failing tests pass, then refactors.
+- `@code-reviewer` — runs the QA gate (`uv run qa`). Has a Stop hook that enforces it automatically.
 
-The orchestrator's full pipeline: Study → Spec → Build → Review. See `.claude/agents/tdd-orchestrator.md` for details.
+For trivial tasks (typo fix, doc edit, single-line config): skip `/tdd`. Make the change directly, run `uv run qa`, commit.
 </agent-roster>
 
 <exceptional-cases>
