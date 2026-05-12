@@ -1,33 +1,33 @@
 # ai-project-template
 
-A personal project bootstrapper for AI engineering work. Drops a structured, agent-driven workflow into any new project with one command.
+A project bootstrapper for AI engineering work. Drops a structured, TDD-driven workflow into any new project with one command.
 
 ## What this gives you
-
-When you start a new project, this template installs a **4-agent workflow** that runs your code through a strict Test-Driven Development pipeline, plus a documentation system that keeps human and agent shared understanding in sync.
 
 ```
 Empty folder
     │
     ▼
-Drop in bootstrap kit  ──►  Open Claude Code  ──►  Say "/init-project"
-                                                          │
-                                                          ▼
-                                  Interview (stack, scope, container, etc.)
-                                                          │
-                                                          ▼
-                                  Generated project: AGENTS.md, .claude/agents/,
-                                  docs/, .devcontainer/, qa script, hooks
+bash <(curl install.sh)  ──►  Open Claude Code  ──►  /init-project
+                                                           │
+                                                           ▼
+                                   Interview (stack, scope, container, etc.)
+                                                           │
+                                                           ▼
+                                   Generated project: AGENTS.md, /tdd skill,
+                                   subagents, docs/, qa script, hooks
 ```
 
-After bootstrap, four agents take over day-to-day work:
+After bootstrap, day-to-day work runs through one skill and three subagents:
 
-| Agent | Role |
-|---|---|
-| `tdd-orchestrator` | Coordinates the workflow. Delegates, never writes code. |
-| `test-spec-writer` | Turns requirements into failing tests. |
-| `implementer` | Writes minimal code to pass tests. Refactors after green. |
-| `code-reviewer` | Runs the QA gate (`qa` script). Pushes back on quality issues. |
+| | Name | Role |
+|---|---|---|
+| skill | `/tdd` | Runs the full pipeline in the main context: explore → spec → implement → refactor → review |
+| subagent | `@test-spec-writer` | Writes failing tests for complex specs |
+| subagent | `@implementer` | Makes tests pass for large implementations |
+| subagent | `@code-reviewer` | Runs the QA gate. Has a `Stop` hook that enforces `uv run qa` automatically |
+
+The `/tdd` skill stays in the main conversation — context from exploration is alive during implementation. Subagents are called only when a phase is complex enough to warrant isolation.
 
 ## Quick start
 
@@ -35,23 +35,23 @@ After bootstrap, four agents take over day-to-day work:
 # 1. Start a new project
 mkdir my-project && cd my-project && git init
 
-# 2. Pull in the bootstrap kit (installs AGENTS.md + the init-project skill)
+# 2. Pull in the bootstrap kit (installs AGENTS.md + the /init-project skill)
 bash <(curl -fsSL https://raw.githubusercontent.com/Kpakfar/ai-project-template/main/bootstrap/install.sh)
 
 # 3. Open Claude Code and run:
 #    /init-project
 ```
 
-The init skill will interview you, then generate the project-specific scaffold.
+The init skill interviews you (~6 questions), then generates the full scaffold.
 
 ## What's in this repo
 
 ```
 ai-project-template/
-├── bootstrap/                     # The seed kit you drop into new projects
+├── bootstrap/                     # Seed kit — dropped into new projects by install.sh
 │   ├── AGENTS.bootstrap.md
 │   └── install.sh
-├── init-project/                  # The skill that does the heavy lifting
+├── init-project/                  # /init-project skill — interviews + generates scaffold
 │   ├── SKILL.md
 │   └── templates/
 │       ├── python-rag/            # Primary template (FastAPI + pgvector RAG)
@@ -64,24 +64,23 @@ ai-project-template/
 
 ## Design principles
 
-These are encoded throughout the template:
-
-1. **Dev container optional.** Isolated environment, portable across machines, matches production. Recommended but not required — the init skill asks and explains the trade-offs.
-2. **`AGENTS.md` as the constitution.** Single source of truth, symlinked to `CLAUDE.md` for compatibility.
-3. **No global installs.** Everything project-local. Dependencies live in `pyproject.toml`, scripts in `scripts/`.
-4. **Living docs over dead docs.** `structure.txt` and `gotchas.md` get updated by agents during work.
-5. **TDD as the default loop.** Red → Green → Refactor → Review, gated by `qa` script.
-6. **Pragmatic escape hatch.** Tasks under ~1h skip plan/review delegation. Don't over-engineer small changes.
-7. **Self-improving.** Reviewer logs lessons to `gotchas.md`. Generic lessons get backported to this template manually.
+1. **Skill for coordination, subagents for specialisation.** The `/tdd` skill runs the pipeline in the main context. Subagents are called only for phases that need isolation or have hooks.
+2. **`AGENTS.md` as the constitution.** Single source of truth, symlinked to `CLAUDE.md` for Claude Code compatibility.
+3. **Dev container optional.** The init skill explains the trade-offs and asks — no default forced on you.
+4. **No global installs.** Everything project-local. Dependencies in `pyproject.toml`, scripts in `scripts/`.
+5. **Living docs over dead docs.** `structure.txt` and `gotchas.md` stay current — agents update them as they work.
+6. **TDD as the default loop.** Red → Green → Refactor → Review, gated by `uv run qa`.
+7. **Pragmatic escape hatch.** Tasks under ~1h skip delegation. Trivial changes skip `/tdd` entirely.
+8. **Self-improving.** `code-reviewer` logs lessons to `gotchas.md`. Generic lessons get backported to this template.
 
 ## Extending the template
 
-The `python-rag` template is the most complete. Other templates are stubs. When you need them, flesh them out by:
+The `python-rag` template is the most complete. Other templates are stubs. To flesh one out:
 
-1. Copying the structure of `python-rag/`
-2. Swapping stack-specific files (`.devcontainer/Dockerfile`, `scripts/qa.sh`, `docs/structure.txt`)
-3. Adjusting the agent prompts where they mention specific commands
+1. Copy `python-rag/` as a base
+2. Swap stack-specific files (`Dockerfile`, `scripts/qa.sh`, `docs/structure.txt`, `pyproject.toml.example`)
+3. Adjust the subagent prompts where they reference Python-specific commands
 
 ## License
 
-MIT. Use it, fork it, change it.
+MIT. Use it, change it.
