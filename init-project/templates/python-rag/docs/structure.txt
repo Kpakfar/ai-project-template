@@ -1,0 +1,57 @@
+Quick reference:
+docs/current-task/task.md          # active task brief, shared between agents
+docs/current-task/task-template.md # template; copy over task.md when starting a new task
+docs/requirements.md               # what we're building, for whom, why; domain model and stack
+docs/documentation.md              # links to library docs the agent should consult
+docs/backlog.md                    # scoped, queued tasks
+docs/proposals-ideas.md            # out-of-scope ideas, reviewed periodically
+docs/gotchas.md                    # known pitfalls, anti-patterns, lessons learned (living doc)
+docs/structure.txt                 # this file - project layout
+
+Source code:
+src/                               # main application package
+  api/                             # FastAPI routes
+    routes/                        # route modules
+    deps.py                        # FastAPI dependencies
+    main.py                        # app factory
+  core/                            # config, logging, exceptions
+    config.py                      # pydantic-settings config
+    logging.py                     # logging setup
+    exceptions.py                  # custom exception classes
+  domain/                          # business logic, pure functions
+    models.py                      # pydantic domain models
+  infra/                           # I/O: database, vector store, LLM clients
+    db.py                          # Postgres connection, session management
+    vectorstore.py                 # pgvector / Chroma client
+    llm.py                         # LLM client wrappers
+  services/                        # orchestration of domain + infra
+    retrieval.py                   # RAG retrieval logic
+    generation.py                  # RAG generation logic
+
+Tests:
+tests/                             # mirrors src/ structure
+  api/
+  core/
+  domain/
+  infra/
+  services/
+  evals/                           # LLM eval-style tests (retrieval quality, generation quality)
+  fixtures/                        # shared test fixtures, fake data
+  conftest.py                      # pytest config, DB rollback fixture
+
+Configuration:
+pyproject.toml                     # dependencies, tool config (ruff, mypy, pytest), scripts
+.env.example                       # template for environment variables (never commit .env)
+.gitignore
+README.md
+
+Agent infrastructure:
+.claude/agents/                    # 4 agent definitions (orchestrator, spec-writer, implementer, reviewer)
+.claude/hooks/quality-gate.sh      # deterministic QA hook triggered by code-reviewer Stop event
+.claude/skills/                    # project-level skills (init-project, plus any added)
+AGENTS.md                          # the constitution (read first, every conversation)
+CLAUDE.md                          # symlink → AGENTS.md (for Claude Code compatibility)
+
+Dev environment:
+.devcontainer/                     # dev container config (Dockerfile, devcontainer.json)
+scripts/                           # project scripts (qa.sh, etc.)
