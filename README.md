@@ -32,17 +32,15 @@ After bootstrap, four agents take over day-to-day work:
 ## Quick start
 
 ```bash
-# 1. Fork this repo on GitHub, then start a new project
+# 1. Start a new project
 mkdir my-project && cd my-project && git init
 
 # 2. Pull in the bootstrap kit (installs AGENTS.md + the init-project skill)
-bash <(curl -fsSL https://raw.githubusercontent.com/YOUR_GITHUB_USERNAME/ai-project-template/main/bootstrap/install.sh)
+bash <(curl -fsSL https://raw.githubusercontent.com/Kpakfar/ai-project-template/main/bootstrap/install.sh)
 
 # 3. Open Claude Code and run:
 #    /init-project
 ```
-
-> Replace `YOUR_GITHUB_USERNAME` with your GitHub handle after forking.
 
 The init skill will interview you, then generate the project-specific scaffold.
 
@@ -68,7 +66,7 @@ ai-project-template/
 
 These are encoded throughout the template:
 
-1. **Dev container by default.** Isolated environment, portable across machines, matches production.
+1. **Dev container optional.** Isolated environment, portable across machines, matches production. Recommended but not required — the init skill asks and explains the trade-offs.
 2. **`AGENTS.md` as the constitution.** Single source of truth, symlinked to `CLAUDE.md` for compatibility.
 3. **No global installs.** Everything project-local. Dependencies live in `pyproject.toml`, scripts in `scripts/`.
 4. **Living docs over dead docs.** `structure.txt` and `gotchas.md` get updated by agents during work.

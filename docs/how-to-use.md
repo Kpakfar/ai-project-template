@@ -1,17 +1,5 @@
 # How to use this template
 
-## Setting up the template repo (one-time)
-
-1. Fork this repo on GitHub (keep the name `ai-project-template`, or rename it).
-2. In `bootstrap/install.sh`, update the `REPO` variable to point to your fork:
-   ```bash
-   REPO="YOUR_GITHUB_USERNAME/ai-project-template"
-   ```
-3. Commit and push. Verify the raw URLs work:
-   - `https://raw.githubusercontent.com/YOUR_GITHUB_USERNAME/ai-project-template/main/bootstrap/install.sh`
-   - `https://raw.githubusercontent.com/YOUR_GITHUB_USERNAME/ai-project-template/main/bootstrap/AGENTS.bootstrap.md`
-   - `https://raw.githubusercontent.com/YOUR_GITHUB_USERNAME/ai-project-template/main/init-project/SKILL.md`
-
 ## Starting a new project
 
 Two equivalent options:
@@ -20,7 +8,7 @@ Two equivalent options:
 
 ```bash
 mkdir my-new-project && cd my-new-project && git init
-bash <(curl -fsSL https://raw.githubusercontent.com/YOUR_GITHUB_USERNAME/ai-project-template/main/bootstrap/install.sh)
+bash <(curl -fsSL https://raw.githubusercontent.com/Kpakfar/ai-project-template/main/bootstrap/install.sh)
 ```
 
 Then open Claude Code and run `/init-project`.
@@ -29,9 +17,9 @@ Then open Claude Code and run `/init-project`.
 
 ```bash
 mkdir my-new-project && cd my-new-project && git init
-npx degit YOUR_GITHUB_USERNAME/ai-project-template/bootstrap . --force
+npx degit Kpakfar/ai-project-template/bootstrap . --force
 mkdir -p .claude/skills
-npx degit YOUR_GITHUB_USERNAME/ai-project-template/init-project .claude/skills/init-project --force
+npx degit Kpakfar/ai-project-template/init-project .claude/skills/init-project --force
 ```
 
 Then open Claude Code and run `/init-project`.
@@ -40,7 +28,7 @@ Then open Claude Code and run `/init-project`.
 
 1. The skill confirms intent with you.
 2. It runs `npx skills@latest add mattpocock/skills` (you pick which skills).
-3. It interviews you (~6 questions).
+3. It interviews you (~6 questions, including whether you want a dev container).
 4. It generates the project scaffold from `init-project/templates/<your-stack>/`.
 5. It symlinks `CLAUDE.md` → `AGENTS.md`.
 6. It removes itself from the project (the init skill is no longer needed).

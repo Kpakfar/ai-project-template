@@ -16,13 +16,15 @@ This is the **self-improvement memory** of the project. Agents update this after
 
 ## Entries
 
-<!-- Add entries here. Newest first. -->
+<!-- Add entries here. Newest first. Use this format:
 
-### [Template] How to add a new gotcha
-**Symptom:** Future agent or human encounters a confusing behavior.
-**Cause:** Something non-obvious in the code, stack, or process.
-**Fix:** Document it here with enough context that someone can avoid it.
-**Date / Task:** {{DATE}} / bootstrap
+### [Area] Short title
+**Symptom:** what looked broken / surprising
+**Cause:** why it happened
+**Fix:** what works
+**Date / Task:** YYYY-MM-DD / task name
+
+-->
 
 ---
 

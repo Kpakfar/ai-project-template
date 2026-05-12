@@ -1,5 +1,5 @@
 <development-process>
-- You are working in a devcontainer. All commands run inside it. Do not install anything globally on the host.
+- Dev container: {{USES_DEVCONTAINER}}. If yes, all commands run inside the container — do not install anything globally on the host.
 - Always start by reading `docs/structure.txt` and `docs/requirements.md` in parallel to orient yourself.
 - Always consult `docs/documentation.md` for links to library docs. Fetch them when in doubt.
 - If you encounter unfamiliar libraries, APIs, or patterns, research online before guessing. Fetch the actual documentation.

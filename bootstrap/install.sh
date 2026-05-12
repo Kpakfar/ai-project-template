@@ -2,9 +2,7 @@
 # install.sh - Bootstrap a new project from this template.
 #
 # Usage:
-#   bash <(curl -fsSL https://raw.githubusercontent.com/YOUR_GITHUB_USERNAME/ai-project-template/main/bootstrap/install.sh)
-#
-# Before using: fork this repo and update the REPO variable below with your GitHub username.
+#   bash <(curl -fsSL https://raw.githubusercontent.com/Kpakfar/ai-project-template/main/bootstrap/install.sh)
 #
 # This script:
 #   1. Drops the bootstrap AGENTS.md into the current directory
@@ -13,9 +11,7 @@
 
 set -euo pipefail
 
-# ── Update this after forking (or override with: REPO=user/repo bash install.sh) ──
-REPO="${REPO:-YOUR_GITHUB_USERNAME/ai-project-template}"
-# ─────────────────────────────────────────────────────────────────────────────
+REPO="${REPO:-Kpakfar/ai-project-template}"
 
 BRANCH="${BRANCH:-main}"
 RAW="https://raw.githubusercontent.com/${REPO}/${BRANCH}"

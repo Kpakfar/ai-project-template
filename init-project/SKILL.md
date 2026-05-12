@@ -77,8 +77,6 @@ Present a menu:
   4) generic          Language-agnostic, you'll fill in commands manually
 ```
 
-For Turing College AI Engineering sprints 2-3, `python-rag` is the default.
-
 If user is uncertain, recommend based on their answers to Q1-Q2. Don't accept "I don't know" - push for a choice. Bad choices can be changed later; no choice means no progress.
 
 #### Q4. Frontend?
@@ -88,10 +86,12 @@ If user is uncertain, recommend based on their answers to Q1-Q2. Don't accept "I
   - No, API-only or notebook-only
 
 #### Q5. Dev container?
-- Run in a dev container? (Recommended yes.)
+- Do you want to run this project in a dev container? (yes / no)
 - If yes, what's the base image? Default: matches the stack chosen.
 
-Reasoning to share: the workshop strongly recommended containers because they let you give the coding agent permissive permissions safely, match production, and isolate dependencies.
+Share these trade-offs so the user can decide:
+- **Yes:** isolated environment, reproducible across machines, matches production, lets the coding agent run with permissive permissions safely.
+- **No:** simpler setup, no Docker required, easier if you're on a constrained machine or just prototyping.
 
 #### Q6. AI-specific features (for python-rag and python-api with AI)
 - Will this project use:
@@ -126,6 +126,7 @@ Read the chosen template from `templates/{stack}/` (see structure below). For ea
 2. Substitute placeholders (see "Placeholder substitution" below)
 3. Write the file to the project root at the corresponding path
 4. If the template path is `templates/python-rag/AGENTS.md`, write to `./AGENTS.md`
+5. **Skip `.devcontainer/` entirely if `{{USES_DEVCONTAINER}}` is `no`**
 
 After all files are written:
 
