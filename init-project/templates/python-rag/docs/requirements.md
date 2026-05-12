@@ -65,7 +65,7 @@ Things explicitly NOT in this iteration. Move from here to `proposals-ideas.md` 
 
 ## Constraints
 
-- Time: TODO (e.g., Sprint 2-3 of Turing College AI Engineering)
+- Time: TODO (e.g., 2-week sprint, hackathon, side project)
 - Cost: TODO (e.g., OpenAI API budget)
 - Data: TODO (corpus size, allowed sources, licensing)
 
