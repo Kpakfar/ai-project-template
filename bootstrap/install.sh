@@ -13,8 +13,8 @@
 
 set -euo pipefail
 
-# ── Update this after forking ────────────────────────────────────────────────
-REPO="YOUR_GITHUB_USERNAME/ai-project-template"
+# ── Update this after forking (or override with: REPO=user/repo bash install.sh) ──
+REPO="${REPO:-YOUR_GITHUB_USERNAME/ai-project-template}"
 # ─────────────────────────────────────────────────────────────────────────────
 
 BRANCH="${BRANCH:-main}"
