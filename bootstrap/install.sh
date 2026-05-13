@@ -6,35 +6,45 @@
 #
 # This script:
 #   1. Drops the bootstrap AGENTS.md into the current directory
-#   2. Installs the init-project skill into .claude/skills/
+#   2. Installs the init-project skill (SKILL.md + templates/) into
+#      .claude/skills/init-project/ using `npx degit`
 #   3. Prints next steps
+#
+# Requires: curl, npx (Node.js).
 
 set -euo pipefail
 
 REPO="${REPO:-Kpakfar/ai-project-template}"
-
 BRANCH="${BRANCH:-main}"
 RAW="https://raw.githubusercontent.com/${REPO}/${BRANCH}"
 
-echo "==> Bootstrapping AI project from ${REPO}"
+echo "==> Bootstrapping AI project from ${REPO} (branch: ${BRANCH})"
 echo
 
 # Sanity: make sure the current directory looks safe to bootstrap into.
-if [[ -f "AGENTS.md" ]] || [[ -d ".claude/agents" ]]; then
-  echo "ERROR: This project already appears to be initialized."
-  echo "Found existing AGENTS.md or .claude/agents/ directory."
-  echo "Refusing to overwrite. Bootstrap into an empty directory instead."
+if [[ -f "AGENTS.md" ]] || [[ -d ".claude/agents" ]] || [[ -d ".claude/skills/init-project" ]]; then
+  echo "ERROR: This project already appears to be initialized." >&2
+  echo "Found existing AGENTS.md, .claude/agents/, or .claude/skills/init-project/." >&2
+  echo "Refusing to overwrite. Bootstrap into an empty directory instead." >&2
+  exit 1
+fi
+
+# Required tools.
+if ! command -v npx >/dev/null 2>&1; then
+  echo "ERROR: 'npx' not found. The bootstrap uses 'npx degit' to fetch the" >&2
+  echo "init-project skill (including its templates/ directory). Install Node.js," >&2
+  echo "then re-run." >&2
   exit 1
 fi
 
 # 1. Drop the bootstrap AGENTS.md.
 echo "==> Installing bootstrap AGENTS.md"
-curl -fsSL "${RAW}/bootstrap/AGENTS.bootstrap.md" -o AGENTS.md
+curl -fsSL "${RAW}/bootstrap/AGENTS.md" -o AGENTS.md
 
-# 2. Install the init-project skill.
+# 2. Install the init-project skill (SKILL.md + templates/).
 echo "==> Installing init-project skill into .claude/skills/init-project/"
-mkdir -p .claude/skills/init-project
-curl -fsSL "${RAW}/init-project/SKILL.md" -o .claude/skills/init-project/SKILL.md
+mkdir -p .claude/skills
+npx --yes degit "${REPO}/init-project#${BRANCH}" .claude/skills/init-project --force
 
 # 3. Done.
 cat <<'EOF'
@@ -49,6 +59,8 @@ Next steps:
   2. Install the supporting skills (recommended):
        npx skills@latest add mattpocock/skills
      Pick at least: grill-me, tdd, to-prd, caveman, write-a-skill, handoff
+     (The upstream 'tdd' skill does NOT collide with the project-local
+      '/tdd-pipeline' skill that init-project will generate.)
 
   3. In Claude Code, run:
        /init-project

@@ -33,7 +33,8 @@ The init-project skill will interview the user, then generate:
 
 - `AGENTS.md` (project-specific, replacing this file)
 - `CLAUDE.md` (symlinked to `AGENTS.md` for Claude Code compatibility)
-- `.claude/agents/` with four agent definitions
+- `.claude/skills/tdd-pipeline/` with the `/tdd-pipeline` coordination skill
+- `.claude/agents/` with three subagent definitions
 - `docs/` with templates filled in from the interview
 - `.devcontainer/` if requested
 - `scripts/qa.sh` tailored to the chosen stack

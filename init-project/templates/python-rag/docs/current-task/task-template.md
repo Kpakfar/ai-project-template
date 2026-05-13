@@ -1,7 +1,7 @@
 # Current Task
 
 > Copy this template over `task.md` when starting a new task.
-> Each agent (orchestrator, spec-writer, implementer, reviewer) appends its own section as it works.
+> The `/tdd-pipeline` skill driver and each subagent (spec-writer, implementer, reviewer) append their own section as they work.
 
 ## Brief
 
@@ -25,7 +25,7 @@
 - `docs/gotchas.md` (relevant entries: TODO)
 - Existing code: TODO
 
-## Plan (by orchestrator or inline for small tasks)
+## Plan (by /tdd-pipeline driver or inline for small tasks)
 
 <!-- High-level approach. For tasks under 1h, skip to Spec. -->
 

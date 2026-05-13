@@ -5,7 +5,7 @@
 - If you encounter unfamiliar libraries, APIs, or patterns, research online before guessing. Fetch the actual documentation.
 - Work in this directory/repo only. Never touch files outside this repo unless explicitly instructed.
 - It is your responsibility to manage the environment and install any new dependencies as needed (add to `pyproject.toml`, run `uv sync`).
-- Run `uv run python -c "import json, tomllib; print(json.dumps(tomllib.load(open('pyproject.toml','rb')).get('tool',{}).get('scripts',{}), indent=2))"` to check available scripts. Common ones: `uv run qa`, `uv run test`, `uv run lint`.
+- Bundled scripts live under `[project.scripts]` in `pyproject.toml`. The one that ships with this template is `uv run qa` (lint + format + types + tests). Add more scripts there and they become `uv run <name>`.
 </development-process>
 
 <global-documents>
@@ -44,7 +44,7 @@ This runs (in order): `ruff check --fix`, `ruff format`, `mypy`, `pytest`. All m
 
 If `qa` fails, iterate on the failing step. Don't skip steps. Don't comment out failing tests to make `qa` pass.
 
-The `code-reviewer` agent will run `qa` as part of Phase 7 review.
+The `code-reviewer` subagent runs `qa` during the review phase. A `Stop` hook (auto-converted to `SubagentStop`) re-runs `qa` after the review and blocks the subagent from completing (exit code 2) if QA fails — so APPROVE cannot ship a red build.
 </quality-gate>
 
 <self-improvement>
@@ -59,21 +59,21 @@ Do not skip these. The system gets better only if these living docs stay current
 </self-improvement>
 
 <agent-roster>
-For any non-trivial task, invoke the `/tdd` skill. It runs the full pipeline in the current context and delegates to subagents only where it makes sense.
+For any non-trivial task, invoke the `/tdd-pipeline` skill. It runs the full pipeline in the current context and delegates to subagents only where it makes sense.
 
 **Skill:**
-- `/tdd` — full TDD pipeline: explore → spec → implement → refactor → review. Stays in main context.
+- `/tdd-pipeline` — full TDD pipeline: explore → spec → implement → refactor → review. Stays in main context.
 
 **Subagents** (called by the skill for complex phases, or directly for ad-hoc work):
 - `@test-spec-writer` — writes failing tests for a given requirement.
 - `@implementer` — makes failing tests pass, then refactors.
-- `@code-reviewer` — runs the QA gate (`uv run qa`). Has a Stop hook that enforces it automatically.
+- `@code-reviewer` — runs the QA gate (`uv run qa`). Has a `Stop` hook (auto-converted to `SubagentStop`) that re-runs QA and blocks completion on failure.
 
-For trivial tasks (typo fix, doc edit, single-line config): skip `/tdd`. Make the change directly, run `uv run qa`, commit.
+For trivial tasks (typo fix, doc edit, single-line config): skip `/tdd-pipeline`. Make the change directly, run `uv run qa`, commit.
 </agent-roster>
 
 <exceptional-cases>
-**Trivial tasks** (typos, doc edits, single-line fixes): skip the full TDD pipeline. Make the change directly, run `qa`, commit.
+**Trivial tasks** (typos, doc edits, single-line fixes): skip `/tdd-pipeline`. Make the change directly, run `qa`, commit.
 
 **Exploratory spikes** (research, prototyping to learn): work in a separate `experiments/` folder. No TDD required. Document findings in `docs/proposals-ideas.md`.
 

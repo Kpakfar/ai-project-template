@@ -18,4 +18,4 @@ Update `docs/structure.txt` to reflect the simpler layout.
 
 ## When to use
 
-When you want the structured 4-agent workflow but the project doesn't involve AI/RAG/agents at all.
+When you want the structured /tdd-pipeline skill + 3 subagents but the project doesn't involve AI/RAG/agents at all.

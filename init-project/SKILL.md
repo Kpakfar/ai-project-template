@@ -1,6 +1,6 @@
 ---
 name: init-project
-description: Bootstrap a new AI engineering project with the 4-agent TDD workflow, dev container, and structured documentation. Use this skill whenever a project is uninitialized (no docs/structure.txt or .claude/agents/), when the user says "init", "bootstrap", "set up this project", "/init-project", or describes wanting to start a new project. Interviews the user about stack and scope, then generates AGENTS.md, .claude/agents/, docs/, .devcontainer/, and a qa script tailored to the chosen template.
+description: Bootstrap a new AI engineering project with the /tdd-pipeline coordination skill, three focused subagents, dev container, and structured documentation. Use this skill whenever a project is uninitialized (no docs/structure.txt or .claude/agents/), when the user says "init", "bootstrap", "set up this project", "/init-project", or describes wanting to start a new project. Interviews the user about stack and scope, then generates AGENTS.md, .claude/skills/tdd-pipeline/, .claude/agents/, docs/, .devcontainer/, and a qa script tailored to the chosen template.
 ---
 
 # init-project
@@ -18,7 +18,7 @@ This skill bootstraps a new project with a structured, agent-driven workflow.
 A fully structured project with:
 
 - `AGENTS.md` and `CLAUDE.md` (symlinked) - the constitution
-- `.claude/skills/tdd/` - the `/tdd` skill: full TDD pipeline in the main context
+- `.claude/skills/tdd-pipeline/` - the `/tdd-pipeline` skill: full TDD pipeline in the main context
 - `.claude/agents/` - three focused subagents (test-spec-writer, implementer, code-reviewer)
 - `.claude/hooks/quality-gate.sh` - deterministic QA hook triggered by code-reviewer
 - `docs/` - living documentation (structure, requirements, gotchas, backlog, current-task)
@@ -46,7 +46,7 @@ If `mattpocock/skills` are not yet installed (check `.claude/skills/` for `grill
 npx skills@latest add mattpocock/skills
 ```
 
-Recommend the user pick at minimum: `grill-me`, `tdd`, `to-prd`, `caveman`, `write-a-skill`, `handoff`.
+Recommend the user pick at minimum: `grill-me`, `tdd`, `to-prd`, `caveman`, `write-a-skill`, `handoff`. The upstream `tdd` skill is a generic Red→Green→Refactor companion; it does **not** collide with the project-local `/tdd-pipeline` skill (different name).
 
 Skip this step if skills are already present.
 
@@ -72,7 +72,7 @@ This goes into `requirements.md` as the "Why" section.
 Present a menu:
 
 ```
-  1) python-rag       FastAPI + Postgres + pgvector + LangChain (RAG/agents)
+  1) python-rag       FastAPI + Postgres + pgvector + OpenAI/Anthropic SDKs (RAG/agents)
   2) python-api       FastAPI + Postgres (plain API, no AI features)
   3) typescript-fullstack  Next.js + tRPC + Drizzle + Postgres
   4) generic          Language-agnostic, you'll fill in commands manually
@@ -91,7 +91,7 @@ If user is uncertain, recommend based on their answers to Q1-Q2. Don't accept "I
 - If yes, what's the base image? Default: matches the stack chosen.
 
 Share these trade-offs so the user can decide:
-- **Yes:** isolated environment, reproducible across machines, matches production, lets the coding agent run with permissive permissions safely.
+- **Yes:** isolated environment, reproducible across machines, matches production, and confines what an agent with broad permissions can touch on the host filesystem.
 - **No:** simpler setup, no Docker required, easier if you're on a constrained machine or just prototyping.
 
 #### Q6. AI-specific features (for python-rag and python-api with AI)
@@ -135,7 +135,6 @@ After all files are written:
    - On Windows without WSL, instead create `CLAUDE.md` as a one-line pointer: `# See @AGENTS.md`
 2. Make scripts executable: `chmod +x scripts/qa.sh .claude/hooks/quality-gate.sh`
 3. Delete the temp file: `rm docs/_init-answers.md`
-4. Delete the bootstrap AGENTS.md (it's been overwritten by the template AGENTS.md, but double-check)
 
 ### Phase 5: Verify and report
 
@@ -159,7 +158,7 @@ Report what was generated, then hand off:
 > "Bootstrap complete. Your project is ready. Next steps:
 > 1. Reopen in dev container (if applicable)
 > 2. Initialize git: `git add . && git commit -m 'chore: bootstrap project'`
-> 3. Start your first task: tell me what you want to build, and I'll route it through the tdd-orchestrator."
+> 3. Start your first task: tell me what you want to build, and I'll route it through `/tdd-pipeline`."
 
 ---
 
@@ -209,7 +208,7 @@ OK, but require minimum answers: project name, stack, dev container yes/no. Skip
 Refuse unless they explicitly confirm overwriting. Show what would be overwritten first.
 
 **Skill installation fails (no npm/node).**
-Skip Phase 1. The skills are recommended but not required. The 4-agent workflow works without them.
+Skip Phase 1. The skills are recommended but not required. The `/tdd-pipeline` skill plus the three subagents work without them.
 
 ---
 
@@ -220,7 +219,7 @@ Once bootstrap completes, the project enters normal mode. The agent should:
 1. Read `AGENTS.md` on every new conversation
 2. Read `docs/structure.txt` and `docs/requirements.md` first when starting work
 3. Use `docs/current-task/task.md` as shared memory across agents during a task
-4. Delegate to the four agents via the orchestrator
+4. Run `/tdd-pipeline` for non-trivial tasks; it delegates to the three subagents where useful
 5. Update `docs/gotchas.md` when a task surfaces a lesson worth keeping
 6. Update `docs/structure.txt` when project layout changes
 

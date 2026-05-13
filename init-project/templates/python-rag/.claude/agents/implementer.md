@@ -3,8 +3,8 @@ name: implementer
 description: >-
   Use this agent to implement features against an existing failing test suite
   (TDD Green phase) and then refactor (TDD Refactor phase). Invoked by the
-  /tdd skill for large or complex implementations, or directly when tests
-  already exist and just need code to pass them.
+  /tdd-pipeline skill for large or complex implementations, or directly when
+  tests already exist and just need code to pass them.
 
   <example>
   user: "Implement the /retrieve endpoint so the failing tests pass."
@@ -50,7 +50,7 @@ Write the least code necessary to make the tests pass. No premature abstraction.
 
 Update `docs/current-task/task.md` with an `## Implementation notes` section: decisions made, trade-offs, files touched.
 
-Hand off to `@code-reviewer` (or the `/tdd` skill will do this). Tell the reviewer what was deliberately changed so it doesn't flag intentional changes as regressions.
+Hand off to `@code-reviewer` (or the `/tdd-pipeline` skill will do this). Tell the reviewer what was deliberately changed so it doesn't flag intentional changes as regressions.
 
 ## What you never do
 

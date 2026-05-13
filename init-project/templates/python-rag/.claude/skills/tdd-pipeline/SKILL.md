@@ -1,5 +1,5 @@
 ---
-name: tdd
+name: tdd-pipeline
 description: >-
   Run a task through the full TDD pipeline: explore → failing tests →
   implementation → refactor → code review. Use when the user provides a
@@ -7,7 +7,7 @@ description: >-
 
   <example>
   user: "Add a /retrieve endpoint that returns the top 5 chunks for a query."
-  assistant: [invokes /tdd, runs full pipeline in main context, hands off to @code-reviewer at the end]
+  assistant: [invokes /tdd-pipeline, runs full pipeline in main context, hands off to @code-reviewer at the end]
   </example>
 ---
 

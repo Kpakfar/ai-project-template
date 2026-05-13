@@ -13,11 +13,11 @@ bash <(curl -fsSL https://raw.githubusercontent.com/Kpakfar/ai-project-template/
 
 Then open Claude Code and run `/init-project`.
 
-### Option B: degit (no curl, no execution)
+### Option B: manual (curl + degit, no `bash <(curl ...)`)
 
 ```bash
 mkdir my-new-project && cd my-new-project && git init
-npx degit Kpakfar/ai-project-template/bootstrap . --force
+curl -fsSL https://raw.githubusercontent.com/Kpakfar/ai-project-template/main/bootstrap/AGENTS.md -o AGENTS.md
 mkdir -p .claude/skills
 npx degit Kpakfar/ai-project-template/init-project .claude/skills/init-project --force
 ```
@@ -29,7 +29,7 @@ Then open Claude Code and run `/init-project`.
 1. The skill confirms intent with you.
 2. It runs `npx skills@latest add mattpocock/skills` (you pick which skills).
 3. It interviews you (~6 questions, including whether you want a dev container).
-4. It generates the project scaffold from `init-project/templates/<your-stack>/`.
+4. It generates the project scaffold from `.claude/skills/init-project/templates/<your-stack>/`.
 5. It symlinks `CLAUDE.md` → `AGENTS.md`.
 6. It removes itself from the project (the init skill is no longer needed).
 

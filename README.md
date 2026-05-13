@@ -14,20 +14,20 @@ bash <(curl install.sh)  ──►  Open Claude Code  ──►  /init-project
                                    Interview (stack, scope, container, etc.)
                                                            │
                                                            ▼
-                                   Generated project: AGENTS.md, /tdd skill,
-                                   subagents, docs/, qa script, hooks
+                                   Generated project: AGENTS.md, /tdd-pipeline
+                                   skill, subagents, docs/, qa script, hooks
 ```
 
 After bootstrap, day-to-day work runs through one skill and three subagents:
 
 | | Name | Role |
 |---|---|---|
-| skill | `/tdd` | Runs the full pipeline in the main context: explore → spec → implement → refactor → review |
+| skill | `/tdd-pipeline` | Runs the full pipeline in the main context: explore → spec → implement → refactor → review |
 | subagent | `@test-spec-writer` | Writes failing tests for complex specs |
 | subagent | `@implementer` | Makes tests pass for large implementations |
-| subagent | `@code-reviewer` | Runs the QA gate. Has a `Stop` hook that enforces `uv run qa` automatically |
+| subagent | `@code-reviewer` | Runs the QA gate. Has a `Stop` hook that runs `uv run qa` after the review and blocks completion (exit code 2) if it fails |
 
-The `/tdd` skill stays in the main conversation — context from exploration is alive during implementation. Subagents are called only when a phase is complex enough to warrant isolation.
+The `/tdd-pipeline` skill stays in the main conversation — context from exploration is alive during implementation. Subagents are called only when a phase is complex enough to warrant isolation.
 
 ## Quick start
 
@@ -49,7 +49,7 @@ The init skill interviews you (~6 questions), then generates the full scaffold.
 ```
 ai-project-template/
 ├── bootstrap/                     # Seed kit — dropped into new projects by install.sh
-│   ├── AGENTS.bootstrap.md
+│   ├── AGENTS.md                  # the bootstrap-mode AGENTS.md (lands as ./AGENTS.md)
 │   └── install.sh
 ├── init-project/                  # /init-project skill — interviews + generates scaffold
 │   ├── SKILL.md
@@ -64,13 +64,13 @@ ai-project-template/
 
 ## Design principles
 
-1. **Skill for coordination, subagents for specialisation.** The `/tdd` skill runs the pipeline in the main context. Subagents are called only for phases that need isolation or have hooks.
+1. **Skill for coordination, subagents for specialisation.** The `/tdd-pipeline` skill runs the pipeline in the main context. Subagents are called only for phases that need isolation or have hooks. The skill is renamed from `tdd` to `tdd-pipeline` so it doesn't collide with the upstream `mattpocock/skills` `tdd` skill, which you may install alongside it.
 2. **`AGENTS.md` as the constitution.** Single source of truth, symlinked to `CLAUDE.md` for Claude Code compatibility.
 3. **Dev container optional.** The init skill explains the trade-offs and asks — no default forced on you.
 4. **No global installs.** Everything project-local. Dependencies in `pyproject.toml`, scripts in `scripts/`.
 5. **Living docs over dead docs.** `structure.txt` and `gotchas.md` stay current — agents update them as they work.
 6. **TDD as the default loop.** Red → Green → Refactor → Review, gated by `uv run qa`.
-7. **Pragmatic escape hatch.** Tasks under ~1h skip delegation. Trivial changes skip `/tdd` entirely.
+7. **Pragmatic escape hatch.** Tasks under ~1h skip delegation. Trivial changes skip `/tdd-pipeline` entirely.
 8. **Self-improving.** `code-reviewer` logs lessons to `gotchas.md`. Generic lessons get backported to this template.
 
 ## Extending the template
