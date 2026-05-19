@@ -56,16 +56,17 @@ Next steps:
   1. Open Claude Code in this directory:
        claude
 
-  2. Install the supporting skills (recommended):
+  2. Install the supporting skills (REQUIRED):
        npx skills@latest add mattpocock/skills
-     Pick at least: grill-me, tdd, to-prd, caveman, write-a-skill, handoff
-     (The upstream 'tdd' skill does NOT collide with the project-local
-      '/tdd-pipeline' skill that init-project will generate.)
+     Pick at minimum: tdd, grill-me, to-prd, caveman, write-a-skill, handoff
+     The 'tdd' skill is the Red -> Green -> Refactor methodology this template
+     relies on. The 3 generated subagents pair with it.
 
   3. In Claude Code, run:
        /init-project
      (or just say: "bootstrap this project")
 
-The init skill will interview you about the project and generate the full structure.
+The init skill will interview you about the project and generate the full structure,
+including a .mcp.json with Context7 wired up for live library docs lookup.
 
 EOF

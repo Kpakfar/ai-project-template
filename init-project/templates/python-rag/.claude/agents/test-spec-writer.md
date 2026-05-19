@@ -2,8 +2,10 @@
 name: test-spec-writer
 description: >-
   Use this agent to translate a feature request or user story into concrete,
-  failing test cases (TDD Red phase). Invoked by the /tdd-pipeline skill for
-  complex test suites, or directly for ad-hoc test work.
+  failing test cases (TDD Red phase). Use when a test suite is complex enough
+  to warrant isolation from the main context, or for ad-hoc test work. Pairs
+  naturally with the upstream `tdd` skill (mattpocock/skills) running in the
+  main context.
 
   <example>
   user: "Write tests for a /retrieve endpoint returning top-5 chunks."

@@ -48,9 +48,9 @@ README.md
 Agent infrastructure:
 .claude/agents/                    # subagent definitions (test-spec-writer, implementer, code-reviewer)
 .claude/hooks/quality-gate.sh      # deterministic QA hook triggered by code-reviewer Stop event
-.claude/skills/tdd-pipeline/SKILL.md  # /tdd-pipeline skill — full TDD pipeline, runs in main context
+.mcp.json                          # MCP server config (Context7 for live library docs)
 AGENTS.md                          # the constitution (read first, every conversation)
-CLAUDE.md                          # symlink → AGENTS.md (for Claude Code compatibility)
+CLAUDE.md                          # symlink to AGENTS.md (for Claude Code compatibility)
 
 Dev environment:
 .devcontainer/                     # dev container config (Dockerfile, devcontainer.json)

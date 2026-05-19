@@ -1,6 +1,6 @@
 ---
 name: init-project
-description: Bootstrap a new AI engineering project with the /tdd-pipeline coordination skill, three focused subagents, dev container, and structured documentation. Use this skill whenever a project is uninitialized (no docs/structure.txt or .claude/agents/), when the user says "init", "bootstrap", "set up this project", "/init-project", or describes wanting to start a new project. Interviews the user about stack and scope, then generates AGENTS.md, .claude/skills/tdd-pipeline/, .claude/agents/, docs/, .devcontainer/, and a qa script tailored to the chosen template.
+description: Bootstrap a new AI engineering project with three focused subagents, a quality-gate hook, Context7 MCP wired up for live library docs, a dev container, and structured documentation. Use this skill whenever a project is uninitialized (no docs/structure.txt or .claude/agents/), when the user says "init", "bootstrap", "set up this project", "/init-project", or describes wanting to start a new AI engineering project. Interviews the user about stack and scope, then generates AGENTS.md, .claude/agents/, .mcp.json, docs/, .devcontainer/, and a qa script tailored to the chosen template. Pairs with the upstream `tdd` skill from mattpocock/skills, which is installed during bootstrap.
 ---
 
 # init-project
@@ -17,14 +17,16 @@ This skill bootstraps a new project with a structured, agent-driven workflow.
 
 A fully structured project with:
 
-- `AGENTS.md` and `CLAUDE.md` (symlinked) - the constitution
-- `.claude/skills/tdd-pipeline/` - the `/tdd-pipeline` skill: full TDD pipeline in the main context
-- `.claude/agents/` - three focused subagents (test-spec-writer, implementer, code-reviewer)
-- `.claude/hooks/quality-gate.sh` - deterministic QA hook triggered by code-reviewer
-- `docs/` - living documentation (structure, requirements, gotchas, backlog, current-task)
-- `.devcontainer/` - portable development environment (if chosen)
-- `scripts/qa.sh` - bundled quality checks for the chosen stack
-- Stack-specific starter files (pyproject.toml, etc.)
+- `AGENTS.md` and `CLAUDE.md` (symlinked) : the constitution
+- `.claude/agents/` : three focused subagents (test-spec-writer, implementer, code-reviewer)
+- `.claude/hooks/quality-gate.sh` : deterministic QA hook triggered by code-reviewer
+- `.mcp.json` : MCP server config with Context7 wired up for live library docs
+- `docs/` : living documentation (structure, requirements, gotchas, backlog, current-task)
+- `.devcontainer/` : portable development environment (if chosen)
+- `scripts/qa.sh` : bundled quality checks for the chosen stack
+- Stack-specific starter files (`pyproject.toml`, etc.)
+
+The TDD methodology is provided by the upstream `tdd` skill from `mattpocock/skills`, installed during bootstrap. The 3 subagents pair with it: main context drives, subagents are escape hatches for complex phases.
 
 ---
 
@@ -38,17 +40,19 @@ Before doing anything, confirm with the user:
 
 Wait for explicit confirmation.
 
-### Phase 1: Install supporting skills
+### Phase 1: Install supporting skills (REQUIRED)
 
-If `mattpocock/skills` are not yet installed (check `.claude/skills/` for `grill-me`, `tdd`, etc.):
+The `tdd` skill from `mattpocock/skills` is **required**, not optional. The 3 subagents pair with it.
+
+If `mattpocock/skills` are not yet installed (check `.claude/skills/` for `tdd`, `grill-me`, etc.):
 
 ```bash
 npx skills@latest add mattpocock/skills
 ```
 
-Recommend the user pick at minimum: `grill-me`, `tdd`, `to-prd`, `caveman`, `write-a-skill`, `handoff`. The upstream `tdd` skill is a generic Red→Green→Refactor companion; it does **not** collide with the project-local `/tdd-pipeline` skill (different name).
+Required skills (must be installed): `tdd`, `grill-me`, `to-prd`, `caveman`, `write-a-skill`, `handoff`.
 
-Skip this step if skills are already present.
+After the user picks them in the skills picker, verify `tdd` is present before proceeding. If the user refuses or skips, stop and explain why bootstrap cannot continue without `tdd`.
 
 ### Phase 2: Interview (use grill-me style)
 
@@ -78,7 +82,9 @@ Present a menu:
   4) generic          Language-agnostic, you'll fill in commands manually
 ```
 
-If user is uncertain, recommend based on their answers to Q1-Q2. Don't accept "I don't know" - push for a choice. Bad choices can be changed later; no choice means no progress.
+If user is uncertain, recommend based on their answers to Q1-Q2. Don't accept "I don't know" : push for a choice. Bad choices can be changed later; no choice means no progress.
+
+Note: even after picking python-rag, the user can swap dependencies post-bootstrap (e.g. Streamlit instead of FastAPI, ChromaDB instead of pgvector, LangChain instead of raw SDKs). The template is a starting skeleton, not a frozen stack.
 
 #### Q4. Frontend?
 - Will this project have a frontend in this sprint?
@@ -115,7 +121,7 @@ Before generating files, summarize back:
 > - Primary user: {user}
 > - Core flow: {one-sentence flow}
 >
-> This will create approximately {N} files. Proceed?"
+> This will create approximately {N} files including `.mcp.json` for Context7. Proceed?"
 
 Wait for confirmation.
 
@@ -128,6 +134,8 @@ Read the chosen template from `templates/{stack}/` (see structure below). For ea
 3. Write the file to the project root at the corresponding path
 4. If the template path is `templates/python-rag/AGENTS.md`, write to `./AGENTS.md`
 5. **Skip `.devcontainer/` entirely if `{{USES_DEVCONTAINER}}` is `no`**
+
+Make sure `.mcp.json` lands at the project root (not under `.claude/`). This is the location Claude Code checks first.
 
 After all files are written:
 
@@ -145,20 +153,22 @@ Run a quick sanity check:
 test -f AGENTS.md && \
 test -L CLAUDE.md && \
 test -d .claude/agents && \
+test -f .mcp.json && \
 test -d docs && \
 test -f scripts/qa.sh
 ```
 
 If dev container was chosen, recommend the user reopen the project in the container:
 
-> VS Code: Cmd/Ctrl+Shift+P → "Dev Containers: Reopen in Container"
+> VS Code: Cmd/Ctrl+Shift+P -> "Dev Containers: Reopen in Container"
 
 Report what was generated, then hand off:
 
 > "Bootstrap complete. Your project is ready. Next steps:
 > 1. Reopen in dev container (if applicable)
 > 2. Initialize git: `git add . && git commit -m 'chore: bootstrap project'`
-> 3. Start your first task: tell me what you want to build, and I'll route it through `/tdd-pipeline`."
+> 3. Restart Claude Code so `.mcp.json` (Context7) registers.
+> 4. Start your first task: tell me what you want to build."
 
 ---
 
@@ -187,12 +197,12 @@ This skill ships with templates at `templates/{stack}/`. Each template mirrors t
 
 Available templates (see directory listing in this skill's parent):
 
-- `python-rag/` - complete, ready to use
-- `python-api/` - stub
-- `typescript-fullstack/` - stub
-- `generic/` - stub
+- `python-rag/` : complete, ready to use
+- `python-api/` : stub
+- `typescript-fullstack/` : stub
+- `generic/` : stub
 
-If user picks a stub template, generate the AGENTS.md and agents/ directory from python-rag, but mark the QA commands and dependencies as TODO for the user to fill in.
+If user picks a stub template, generate the AGENTS.md and agents/ directory from python-rag, but mark the QA commands and dependencies as TODO for the user to fill in. Always include `.mcp.json` regardless of template, since Context7 is stack-agnostic.
 
 ---
 
@@ -208,7 +218,10 @@ OK, but require minimum answers: project name, stack, dev container yes/no. Skip
 Refuse unless they explicitly confirm overwriting. Show what would be overwritten first.
 
 **Skill installation fails (no npm/node).**
-Skip Phase 1. The skills are recommended but not required. The `/tdd-pipeline` skill plus the three subagents work without them.
+This is a hard failure for this template. The `tdd` skill is required. Stop and ask the user to install Node.js, then re-run.
+
+**Context7 MCP fails to start after bootstrap.**
+Check that `npx` is available. The Context7 server in `.mcp.json` uses `npx -y @upstash/context7-mcp@latest`. If npx is broken, document the failure in `docs/gotchas.md` and instruct the user to either fix npx or remove the Context7 entry from `.mcp.json` (the project still runs without it; agents just lose live docs lookup).
 
 ---
 
@@ -219,8 +232,11 @@ Once bootstrap completes, the project enters normal mode. The agent should:
 1. Read `AGENTS.md` on every new conversation
 2. Read `docs/structure.txt` and `docs/requirements.md` first when starting work
 3. Use `docs/current-task/task.md` as shared memory across agents during a task
-4. Run `/tdd-pipeline` for non-trivial tasks; it delegates to the three subagents where useful
-5. Update `docs/gotchas.md` when a task surfaces a lesson worth keeping
-6. Update `docs/structure.txt` when project layout changes
+4. Use the upstream `tdd` skill (mattpocock/skills) for the Red to Green to Refactor methodology when writing tests and implementations
+5. Delegate to subagents (`@test-spec-writer`, `@implementer`, `@code-reviewer`) only for phases complex enough to warrant isolation
+6. Override subagent models per call (`model: haiku | sonnet | opus` in the Agent invocation) to match cost to complexity
+7. Query Context7 (via the `.mcp.json` MCP server) for library API details rather than relying on training memory
+8. Update `docs/gotchas.md` when a task surfaces a lesson worth keeping
+9. Update `docs/structure.txt` when project layout changes
 
 This skill is no longer needed after bootstrap. It can be deleted from `.claude/skills/` if the user wants to keep the project minimal.

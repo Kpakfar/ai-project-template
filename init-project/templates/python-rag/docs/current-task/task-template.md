@@ -1,7 +1,7 @@
 # Current Task
 
 > Copy this template over `task.md` when starting a new task.
-> The `/tdd-pipeline` skill driver and each subagent (spec-writer, implementer, reviewer) append their own section as they work.
+> The main-context driver (you, in Claude Code) and each subagent (spec-writer, implementer, reviewer) append their own section as they work. The upstream `tdd` skill (mattpocock/skills) provides the Red to Green to Refactor methodology when invoked.
 
 ## Brief
 
@@ -25,7 +25,7 @@
 - `docs/gotchas.md` (relevant entries: TODO)
 - Existing code: TODO
 
-## Plan (by /tdd-pipeline driver or inline for small tasks)
+## Plan (by main-context driver, or inline for small tasks)
 
 <!-- High-level approach. For tasks under 1h, skip to Spec. -->
 

@@ -2,7 +2,7 @@
 
 **Status:** placeholder.
 
-This template will be language-agnostic. The /tdd-pipeline skill + 3 subagents and docs structure are the same, but `scripts/qa.sh` and the dev container are left as TODOs for the user to fill in.
+This template will be language-agnostic. The 3-subagent setup + upstream `tdd` skill (mattpocock/skills) and docs structure are the same, but `scripts/qa.sh` and the dev container are left as TODOs for the user to fill in.
 
 ## To flesh out
 
@@ -17,4 +17,4 @@ Copy `../python-rag/` and:
 
 ## When to use
 
-When the project uses a stack not covered by the other templates (Rust, Go, Elixir, etc.). The /tdd-pipeline skill + 3 subagents + docs structure still applies, but you'll need to customize the commands.
+When the project uses a stack not covered by the other templates (Rust, Go, Elixir, etc.). The 3-subagent setup + upstream `tdd` skill + docs structure still applies, but you'll need to customize the commands.
