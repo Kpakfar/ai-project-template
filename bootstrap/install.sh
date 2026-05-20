@@ -30,10 +30,17 @@ if [[ -f "AGENTS.md" ]] || [[ -d ".claude/agents" ]] || [[ -d ".claude/skills/in
 fi
 
 # Required tools.
-if ! command -v npx >/dev/null 2>&1; then
-  echo "ERROR: 'npx' not found. The bootstrap uses 'npx degit' to fetch the" >&2
-  echo "init-project skill (including its templates/ directory). Install Node.js," >&2
-  echo "then re-run." >&2
+MISSING=()
+command -v npx >/dev/null 2>&1 || MISSING+=("npx (install Node.js: https://nodejs.org/)")
+command -v uv >/dev/null 2>&1 || MISSING+=("uv (https://docs.astral.sh/uv/getting-started/installation/)")
+command -v git >/dev/null 2>&1 || MISSING+=("git")
+
+if [[ ${#MISSING[@]} -gt 0 ]]; then
+  echo "ERROR: Required tools are missing:" >&2
+  for tool in "${MISSING[@]}"; do echo "  - $tool" >&2; done
+  echo >&2
+  echo "Install the missing tools, then re-run the bootstrap." >&2
+  echo "(uv is required because /init-project runs 'uv sync' to install Python deps.)" >&2
   exit 1
 fi
 

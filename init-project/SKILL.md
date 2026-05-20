@@ -25,8 +25,9 @@ A fully structured project with:
 - `.devcontainer/` : portable development environment (if chosen)
 - `scripts/qa.sh` : bundled quality checks for the chosen stack
 - Stack-specific starter files (`pyproject.toml`, etc.)
+- **A working Python venv** with all `pyproject.toml` deps installed via `uv sync` (skipped if dev container chosen; deps install inside the container instead)
 
-The TDD methodology is provided by the upstream `tdd` skill from `mattpocock/skills`, installed during bootstrap. The 3 subagents pair with it: main context drives, subagents are escape hatches for complex phases.
+The TDD methodology is provided by the upstream `tdd` skill from `mattpocock/skills`, installed during this skill's Phase 1. The 3 subagents pair with it: main context drives, subagents are escape hatches for complex phases.
 
 ---
 
@@ -144,6 +145,22 @@ After all files are written:
 2. Make scripts executable: `chmod +x scripts/qa.sh .claude/hooks/quality-gate.sh`
 3. Delete the temp file: `rm docs/_init-answers.md`
 
+### Phase 4.5: Install Python dependencies
+
+If the chosen stack has a `pyproject.toml` (python-rag, python-api, generic-python) AND `{{USES_DEVCONTAINER}}` is `no`:
+
+1. Verify `uv` is available (it should already be, since bootstrap's install.sh checked). If missing, stop and tell the user to install it.
+2. Run `uv sync` to create the venv and install all deps from `pyproject.toml`. This may take 30-120 seconds depending on dep count.
+3. Smoke-test the venv:
+   ```bash
+   uv run python -c "import sys; print(f'Python {sys.version.split()[0]} venv ready')"
+   ```
+4. If `uv sync` fails, leave the scaffold in place (do not roll back). Report the failing dep to the user and tell them to fix `pyproject.toml`, then run `uv sync` themselves.
+
+If `{{USES_DEVCONTAINER}}` is `yes`: **skip** this phase entirely. The deps will install inside the container when the user reopens. The Phase 5 hand-off message reminds them to do so.
+
+If the stack is `typescript-fullstack`: substitute `npm install` (or `pnpm install` / `bun install` if those configs are present).
+
 ### Phase 5: Verify and report
 
 Run a quick sanity check:
@@ -165,7 +182,7 @@ If dev container was chosen, recommend the user reopen the project in the contai
 Report what was generated, then hand off:
 
 > "Bootstrap complete. Your project is ready. Next steps:
-> 1. Reopen in dev container (if applicable)
+> 1. {{If dev container}}: Reopen in dev container, then `uv sync` inside to install Python deps. {{Else}}: Venv is already synced; you can run `uv run qa` to verify.
 > 2. Initialize git: `git add . && git commit -m 'chore: bootstrap project'`
 > 3. Restart Claude Code so `.mcp.json` (Context7) registers.
 > 4. Start your first task: tell me what you want to build."

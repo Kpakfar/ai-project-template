@@ -39,6 +39,7 @@ The init-project skill will interview the user, then generate:
 - `docs/` with templates filled in from the interview
 - `.devcontainer/` if requested
 - `scripts/qa.sh` tailored to the chosen stack
+- **A working Python venv** via `uv sync` (or `npm install` for TS stacks), so the project is runnable as soon as init-project finishes. Skipped if dev container is chosen; deps install inside the container.
 </bootstrap-mode>
 
 <development-process>

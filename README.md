@@ -9,14 +9,19 @@ Empty folder
     │
     ▼
 bash <(curl install.sh)  ──►  Open Claude Code  ──►  /init-project
-                                                           │
+   [checks: uv, npx, git]                                  │
                                                            ▼
                                    Interview (stack, scope, container, etc.)
                                                            │
                                                            ▼
                                    Generated project: AGENTS.md, 3 subagents,
                                    docs/, qa script, hooks, .mcp.json (Context7)
+                                                           │
+                                                           ▼
+                                   uv sync (deps installed, venv ready)
 ```
+
+The bootstrap **validates the environment** (uv, npx, git all present). The `/init-project` skill **provisions the project** (scaffold + venv).
 
 After bootstrap, day-to-day work runs through the upstream `tdd` skill (from `mattpocock/skills`, installed during bootstrap) plus three subagents:
 
