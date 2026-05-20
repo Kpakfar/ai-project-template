@@ -4,28 +4,28 @@
 - Always consult `docs/documentation.md` for links to library docs. Prefer Context7 (see below) for live API lookups.
 - If you encounter unfamiliar libraries, APIs, or patterns, research online before guessing. Fetch the actual documentation.
 - Work in this directory/repo only. Never touch files outside this repo unless explicitly instructed.
-- It is your responsibility to manage the environment and install any new dependencies as needed (add to `pyproject.toml`, run `uv sync`).
-- Bundled scripts live under `[project.scripts]` in `pyproject.toml`. The one that ships with this template is `uv run qa` (lint + format + types + tests). Add more scripts there and they become `uv run <name>`.
+- It is your responsibility to manage the environment and install any new dependencies as needed. The package-manager and install commands for this project are recorded in `docs/language-standards.md`.
+- The bundled quality-gate command is `{{QA_COMMAND}}` (runs lint + format + types + tests in order). It is wired into the QA hook and the CI workflow. Do not bypass it.
 </development-process>
 
 <architecture-discipline>
-These rules keep the codebase small, concrete, and easy to read. Apply them on every file you write or modify.
+These rules are language- and stack-agnostic. Apply them on every file you write or modify.
 
-- **Two-layer split by default.** `src/backend/` for domain logic and I/O. `src/frontend/` (or a top-level `app.py`) for UI. Add a third layer (orchestrator, flow, controller) only when a task literally cannot be expressed without one. No speculative middle layers before there is a concrete reason for them.
+- **Two-layer split by default.** A `backend/` (or equivalent) layer for domain logic and I/O, and a `frontend/` (or `app`, `ui/`) layer for user interface. Add a third layer (orchestrator, flow, controller) only when a task literally cannot be expressed without one. No speculative middle layers before there is a concrete reason for them.
 
-- **One concept per file.** Each backend module owns a single concept: `llm.py`, `prompts.py`, `retriever.py`, `ingestion.py`, `tools.py`, `safety.py`, `config.py`, and so on. Target ~100 lines per file. Hard cap 200. Split before exceeding, not after.
+- **One concept per file.** Each backend module owns a single concept (llm client, prompt loader, retriever, ingestion pipeline, tools, safety check, config, and so on). Target ~100 lines per file. Hard cap 200. Split before exceeding, not after.
 
-- **Prompts as Markdown files.** Store every system prompt as a `.md` file under `prompts/` (or `src/backend/prompts/`). Load them with short helpers. Substitute variables with plain string `.replace("{{placeholder}}", value)`. Do NOT build Jinja-style, Pydantic-style, or class-based prompt builders. The loader module should be under 50 lines.
+- **Prompts as plain text files.** Store every system prompt as a `.md` (or `.txt`) file under a `prompts/` directory. Load them with short helpers. Substitute variables with plain string `.replace("{{placeholder}}", value)` (or the language's equivalent). Do NOT build template-engine-style, ORM-style, or class-based prompt builders. The loader module should be small.
 
-- **Prompt variants are files, not classes.** If you need multiple versions of the same prompt (e.g. zero-shot, few-shot, chain-of-thought, persona A, persona B), save them as separate `.md` files and switch by filename in a config value or `st.session_state` field. No strategy pattern, no registry, no factory.
+- **Prompt variants are files, not classes.** If you need multiple versions of the same prompt (zero-shot, few-shot, chain-of-thought, persona A, persona B), save them as separate files and switch by filename via a config or session-state value. No strategy pattern, no registry, no factory.
 
-- **Pydantic for structured outputs only.** Use Pydantic models to validate LLM responses, define tool inputs/outputs, and capture domain models. Do NOT wrap session state in Pydantic. Do NOT model every dict that crosses a function boundary. Plain `dict[str, X]` and TypedDict are often enough.
+- **Typed structured outputs only where it matters.** Use the language's structured-output validation (Pydantic, Zod, TypedDict + runtime check, etc.) to validate LLM responses, define tool inputs/outputs, and capture domain models. Do NOT wrap UI state or every dict that crosses a function boundary.
 
-- **Session state stays plain.** In Streamlit, use the standard `if "key" not in st.session_state: st.session_state.key = default` pattern. Keep state initialization in one block at the top of the UI module. Do not introduce a session-state class.
+- **Session/UI state stays plain.** Initialize state with the framework's idiomatic pattern. Keep state initialization in one block at the top of the UI module. Do not introduce a state-wrapper class unless real behaviour lives on it.
 
-- **No premature abstraction.** Three similar lines are better than a class with a strategy pattern. The bar for adding an abstraction is "two real callers, not one hypothetical one." If you find yourself writing a base class, a registry, or a plugin system before the second concrete caller exists, stop.
+- **No premature abstraction.** Three similar lines are better than a class with a strategy pattern. The bar for adding an abstraction is "two real callers, not one hypothetical one."
 
-- **Functions over classes.** Prefer plain functions taking simple types (str, dict, list, Pydantic models for structured I/O) and returning them. Reach for a class only when state genuinely lives on the object across method calls.
+- **Functions over classes.** Prefer plain functions taking simple types and returning them. Reach for a class only when state genuinely lives on the object across method calls.
 
 - **Concrete over generic.** A function that does one specific thing well is better than a function that takes a config dict and dispatches. If you find yourself writing `if mode == "X": ... elif mode == "Y": ...`, consider whether you actually want two separate functions.
 
@@ -35,7 +35,8 @@ The test for any new module: a competent peer reading it for the first time shou
 <global-documents>
 - `docs/structure.txt` : project map (folders, what each is for). Update when layout changes.
 - `docs/requirements.md` : what we're building, for whom, why. Domain model and stack.
-- `docs/documentation.md` : direct links to library docs the agent should consult.
+- `docs/language-standards.md` : language- and tooling-specific conventions (types, imports, async, error handling, dependency management). Filled in by `/init-project` from the answers in setup.
+- `docs/documentation.md` : direct links to library docs the agent should consult. Use Context7 first.
 - `docs/backlog.md` : scoped, queued tasks. Reviewed continuously.
 - `docs/proposals-ideas.md` : out-of-scope or future ideas. Reviewed every ~2 weeks.
 - `docs/gotchas.md` : known pitfalls, anti-patterns, lessons learned. Living document. Update after every task that surfaces something worth keeping.
@@ -49,41 +50,39 @@ When starting a new task, copy `task-template.md` over `task.md` and fill it in.
 </task-specific-documents>
 
 <library-docs>
-This project ships with **Context7 MCP** wired up via `.mcp.json`. Context7 provides up-to-date, version-specific library documentation.
+This project ships with **Context7 MCP** wired up via `.mcp.json`. Context7 provides up-to-date, version-specific library documentation across languages.
 
-**When to use it (always)**: any time you write or modify code that touches a third-party library. Training-data memory will be off in subtle ways, especially for fast-moving libraries (LangChain, Pydantic v2, OpenAI SDK, Streamlit, FastAPI).
+**When to use it (always)**: any time you write or modify code that touches a third-party library. Training-data memory will be off in subtle ways, especially for fast-moving libraries.
 
 **How to use it**:
-- Before writing the code, query Context7 for the relevant API of the **pinned version** in `pyproject.toml`, not the latest available.
-- For Streamlit: look up `st.chat_message`, `st.chat_input`, `st.session_state`, `st.file_uploader`, `st.plotly_chart`.
-- For LangChain: verify `EnsembleRetriever`, `BM25Retriever`, `RecursiveCharacterTextSplitter`, LCEL chain composition.
-- For Pydantic v2: verify field validators, `model_validate`, config classes; the v2 API is unstable across minor versions.
-- For the OpenAI SDK: verify `chat.completions.create`, `chat.completions.parse`, and `extra_body` for OpenRouter passthrough.
+- Before writing the code, query Context7 for the relevant API of the **pinned version** in your manifest file ({{MANIFEST_FILE}}), not the latest available.
+- For frontend frameworks: look up the specific component or hook you intend to use.
+- For LLM SDKs and orchestrators: verify chat/completion calls, structured-output shape, streaming, tool use; these APIs change frequently.
+- For validation/serialization libraries: verify the current version's API; minor versions can be unstable.
 
-**Rule**: do not write code from training-data memory for these libraries. If Context7 returns nothing useful for a query, say so in your summary and propose a fallback (e.g., a smaller, safer call signature, or a WebFetch of the upstream docs).
+**Rule**: do not write code from training-data memory for these libraries. If Context7 returns nothing useful for a query, say so in your summary and propose a fallback (a smaller, safer call signature, or `WebFetch` of the upstream docs).
 </library-docs>
 
 <tools>
-- Use `uv` for all Python dependency and script management. Never `pip install` directly.
-- Use `ruff` for linting and formatting (configured in `pyproject.toml`).
-- Use `mypy` (or `pyright` if configured) for type checking.
-- Use `pytest` for tests. Tests live in `tests/` mirroring `src/` structure.
-- For evals on LLM outputs, use `pytest` with custom fixtures (see `tests/evals/`) or a dedicated eval framework if configured.
+- Use the project's package-manager exclusively (recorded in `docs/language-standards.md`). Never bypass it.
+- Use the project's lint/format/type/test toolchain (recorded in `docs/language-standards.md`). The `{{QA_COMMAND}}` script chains all of them.
 - When a tool could help, use it. Prefer Context7 for library API lookups, `WebFetch` for other web docs. Use MCP tools when relevant.
 </tools>
 
 <quality-gate>
 Before declaring any task complete, run:
 
-```bash
-uv run qa
+```
+{{QA_COMMAND}}
 ```
 
-This runs (in order): `ruff check --fix`, `ruff format`, `mypy`, `pytest`. All must pass.
+This runs lint, format, type-check, and tests in order. All must pass.
 
-If `qa` fails, iterate on the failing step. Don't skip steps. Don't comment out failing tests to make `qa` pass.
+If `{{QA_COMMAND}}` fails, iterate on the failing step. Don't skip steps. Don't comment out failing tests to make it pass.
 
-The `code-reviewer` subagent runs `qa` during the review phase. A `Stop` hook (auto-converted to `SubagentStop`) re-runs `qa` after the review and blocks the subagent from completing (exit code 2) if QA fails, so APPROVE cannot ship a red build.
+The `code-reviewer` subagent runs the quality gate during the review phase. A `Stop` hook (auto-converted to `SubagentStop`) re-runs it after the review and blocks the subagent from completing (exit code 2) if it fails, so APPROVE cannot ship a red build.
+
+CI also runs the same `{{QA_COMMAND}}` on every push and every pull request (see `.github/workflows/qa.yml`). A red CI = a blocked merge.
 </quality-gate>
 
 <self-improvement>
@@ -106,15 +105,15 @@ The main-context driver (you, in Claude Code) is the orchestrator. The upstream 
 **Subagents** (use when a phase is complex enough to warrant an isolated context):
 - `@test-spec-writer` : writes failing tests for a given requirement.
 - `@implementer` : makes failing tests pass, then refactors.
-- `@code-reviewer` : runs the QA gate (`uv run qa`). Has a `Stop` hook (auto-converted to `SubagentStop`) that re-runs QA and blocks completion on failure.
+- `@code-reviewer` : runs the quality gate. Has a `Stop` hook (auto-converted to `SubagentStop`) that re-runs the gate and blocks completion on failure.
 
-**Picking a model per call**: each subagent file has a default `model:` in its frontmatter (currently `sonnet` for all three). You can **override per invocation** by passing `model: sonnet | opus | haiku` in the `Agent` tool call. Use this to match cost to complexity: `haiku` for trivial reviews, `sonnet` for normal work, `opus` for security-sensitive or architecturally tricky code. Override only when the situation justifies it; the defaults are tuned for typical work.
+**Picking a model per call**: each subagent file has a default `model:` in its frontmatter. You can **override per invocation** by passing `model: sonnet | opus | haiku` in the `Agent` tool call. Use this to match cost to complexity: `haiku` for trivial reviews, `sonnet` for normal work, `opus` for security-sensitive or architecturally tricky code. Override only when the situation justifies it; the defaults are tuned for typical work.
 
-For trivial tasks (typo fix, doc edit, single-line config): skip subagents entirely. Make the change directly, run `uv run qa`, commit.
+For trivial tasks (typo fix, doc edit, single-line config): skip subagents entirely. Make the change directly, run `{{QA_COMMAND}}`, commit.
 </agent-roster>
 
 <exceptional-cases>
-**Trivial tasks** (typos, doc edits, single-line fixes): skip subagents. Make the change directly, run `qa`, commit.
+**Trivial tasks** (typos, doc edits, single-line fixes): skip subagents. Make the change directly, run the quality gate, commit.
 
 **Exploratory spikes** (research, prototyping to learn): work in a separate `experiments/` folder. No TDD required. Document findings in `docs/proposals-ideas.md`.
 
@@ -125,6 +124,8 @@ For trivial tasks (typo fix, doc edit, single-line config): skip subagents entir
 Project: {{PROJECT_NAME}}
 Goal: {{PROJECT_GOAL}}
 Primary user: {{PRIMARY_USER}}
-Stack: {{STACK}} ({{AI_FEATURES}})
+Language: {{LANGUAGE}}
+Frontend: {{HAS_FRONTEND}}
+AI features: {{AI_FEATURES}}
 Bootstrapped: {{DATE}}
 -->

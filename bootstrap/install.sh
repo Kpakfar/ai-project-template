@@ -5,12 +5,15 @@
 #   bash <(curl -fsSL https://raw.githubusercontent.com/Kpakfar/ai-project-template/main/bootstrap/install.sh)
 #
 # This script:
-#   1. Drops the bootstrap AGENTS.md into the current directory
-#   2. Installs the init-project skill (SKILL.md + templates/) into
-#      .claude/skills/init-project/ using `npx degit`
-#   3. Prints next steps
+#   1. Validates the environment (curl, git, npx).
+#   2. Drops the bootstrap AGENTS.md into the current directory.
+#   3. Installs the init-project skill (SKILL.md + templates/) into
+#      .claude/skills/init-project/ using `npx degit`.
+#   4. Prints next steps.
 #
-# Requires: curl, npx (Node.js).
+# Language-specific prerequisites (uv, pnpm, cargo, go, etc.) are NOT
+# checked here. /init-project asks you the language and verifies its
+# package manager once the choice is made.
 
 set -euo pipefail
 
@@ -29,18 +32,17 @@ if [[ -f "AGENTS.md" ]] || [[ -d ".claude/agents" ]] || [[ -d ".claude/skills/in
   exit 1
 fi
 
-# Required tools.
+# Required generic tools (the bootstrap itself uses these).
 MISSING=()
+command -v curl >/dev/null 2>&1 || MISSING+=("curl")
 command -v npx >/dev/null 2>&1 || MISSING+=("npx (install Node.js: https://nodejs.org/)")
-command -v uv >/dev/null 2>&1 || MISSING+=("uv (https://docs.astral.sh/uv/getting-started/installation/)")
 command -v git >/dev/null 2>&1 || MISSING+=("git")
 
 if [[ ${#MISSING[@]} -gt 0 ]]; then
-  echo "ERROR: Required tools are missing:" >&2
+  echo "ERROR: Required generic tools are missing:" >&2
   for tool in "${MISSING[@]}"; do echo "  - $tool" >&2; done
   echo >&2
   echo "Install the missing tools, then re-run the bootstrap." >&2
-  echo "(uv is required because /init-project runs 'uv sync' to install Python deps.)" >&2
   exit 1
 fi
 
@@ -73,7 +75,10 @@ Next steps:
        /init-project
      (or just say: "bootstrap this project")
 
-The init skill will interview you about the project and generate the full structure,
-including a .mcp.json with Context7 wired up for live library docs lookup.
+The init skill will interview you about scope and stack, then generate the full
+structure including a .mcp.json with Context7, a GitHub Actions CI workflow,
+a PR template, pre-commit config, and (for fully-supported languages) a working
+venv or equivalent. Language-specific prerequisites (uv for Python, pnpm for
+TypeScript, etc.) are checked by /init-project after you pick a language.
 
 EOF

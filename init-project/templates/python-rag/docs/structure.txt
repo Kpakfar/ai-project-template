@@ -1,48 +1,29 @@
-Quick reference:
-docs/current-task/task.md          # active task brief, shared between agents
-docs/current-task/task-template.md # template; copy over task.md when starting a new task
-docs/requirements.md               # what we're building, for whom, why; domain model and stack
+Quick reference. {{LANGUAGE}} project bootstrapped from ai-project-template.
+Update this file whenever the layout changes.
+
+Living docs:
+docs/structure.txt                 # this file
+docs/requirements.md               # what we're building, for whom, why
+docs/language-standards.md         # language- and tooling-specific conventions
 docs/documentation.md              # links to library docs the agent should consult
 docs/backlog.md                    # scoped, queued tasks
 docs/proposals-ideas.md            # out-of-scope ideas, reviewed periodically
-docs/gotchas.md                    # known pitfalls, anti-patterns, lessons learned (living doc)
-docs/structure.txt                 # this file - project layout
+docs/gotchas.md                    # known pitfalls, anti-patterns, lessons (living)
+docs/current-task/task.md          # active task brief, shared between agents
+docs/current-task/task-template.md # template; copy over task.md when starting a new task
 
-Source code:
-src/                               # main application package
-  api/                             # FastAPI routes
-    routes/                        # route modules
-    deps.py                        # FastAPI dependencies
-    main.py                        # app factory
-  core/                            # config, logging, exceptions
-    config.py                      # pydantic-settings config
-    logging.py                     # logging setup
-    exceptions.py                  # custom exception classes
-  domain/                          # business logic, pure functions
-    models.py                      # pydantic domain models
-  infra/                           # I/O: database, vector store, LLM clients
-    db.py                          # Postgres connection, session management
-    vectorstore.py                 # pgvector / Chroma client
-    llm.py                         # LLM client wrappers
-  services/                        # orchestration of domain + infra
-    retrieval.py                   # RAG retrieval logic
-    generation.py                  # RAG generation logic
+Source code (two-layer split, see AGENTS.md <architecture-discipline>):
+src/backend/                       # domain logic and I/O. One concept per file.
+src/frontend/                      # UI layer. Or top-level app.{{LANG_EXT}}.
 
 Tests:
-tests/                             # mirrors src/ structure
-  api/
-  core/
-  domain/
-  infra/
-  services/
-  evals/                           # LLM eval-style tests (retrieval quality, generation quality)
-  fixtures/                        # shared test fixtures, fake data
-  conftest.py                      # pytest config, DB rollback fixture
+tests/                             # mirrors src/ structure; layout per docs/language-standards.md
 
 Configuration:
-pyproject.toml                     # dependencies, tool config (ruff, mypy, pytest), scripts
+{{MANIFEST_FILE}}                  # dependencies + tool config + bundled scripts
 .env.example                       # template for environment variables (never commit .env)
 .gitignore
+.pre-commit-config.yaml            # local pre-commit hooks (optional)
 README.md
 
 Agent infrastructure:
@@ -52,6 +33,10 @@ Agent infrastructure:
 AGENTS.md                          # the constitution (read first, every conversation)
 CLAUDE.md                          # symlink to AGENTS.md (for Claude Code compatibility)
 
+CI:
+.github/workflows/qa.yml           # runs the quality-gate command on every push and pull request
+.github/pull_request_template.md   # short PR checklist
+
 Dev environment:
-.devcontainer/                     # dev container config (Dockerfile, devcontainer.json)
-scripts/                           # project scripts (qa.sh, etc.)
+.devcontainer/                     # dev container config (if {{USES_DEVCONTAINER}} = yes)
+scripts/                           # project scripts (qa runner and any others added via [project.scripts])

@@ -1,4 +1,4 @@
-# Requirements - {{PROJECT_NAME}}
+# Requirements: {{PROJECT_NAME}}
 
 ## What
 
@@ -33,20 +33,21 @@ Outcome: what the user gets at the end.
 
 ## Stack
 
-**Chosen stack:** {{STACK}}
-
-- **Language:** Python 3.12+
-- **Web framework:** FastAPI
-- **Package manager:** uv
-- **Database:** Postgres
-- **Vector store:** {{VECTOR_DB}}
-- **LLM provider:** TODO (OpenAI / Anthropic / local via Ollama / etc.)
-- **Embeddings:** TODO (model name)
+- **Language:** {{LANGUAGE}} {{LANGUAGE_VERSION}}
+- **Package manager:** {{PACKAGE_MANAGER}}
+- **Quality-gate command:** {{QA_COMMAND}}
+- **Test runner:** {{TEST_RUNNER}}
+- **Lint / format / type-check tools:** {{LINT_TOOL}} / {{FORMAT_TOOL}} / {{TYPE_TOOL}}
 - **Frontend:** {{HAS_FRONTEND}}
-- **Testing:** pytest, pytest-asyncio
-- **Linting/formatting:** ruff
-- **Type checking:** mypy
+- **Backend framework:** {{BACKEND_FRAMEWORK}}
+- **Database / persistence:** {{DATABASE}}
+- **Vector store:** {{VECTOR_DB}}
+- **LLM provider:** {{LLM_PROVIDER}}
+- **Embeddings model:** {{EMBEDDINGS_MODEL}}
 - **Dev container:** {{USES_DEVCONTAINER}}
+- **CI:** GitHub Actions (`.github/workflows/qa.yml`)
+
+Language- and tool-specific conventions are in `docs/language-standards.md`.
 
 ## AI features in scope
 
@@ -66,7 +67,7 @@ Things explicitly NOT in this iteration. Move from here to `proposals-ideas.md` 
 ## Constraints
 
 - Time: TODO (e.g., 2-week sprint, hackathon, side project)
-- Cost: TODO (e.g., OpenAI API budget)
+- Cost: TODO (e.g., LLM API budget)
 - Data: TODO (corpus size, allowed sources, licensing)
 
 ## Open questions

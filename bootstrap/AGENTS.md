@@ -30,16 +30,21 @@ When you detect this state, do the following:
    - If `init-project` is available as a slash command (`/init-project`), invoke it.
    - Otherwise, read `.claude/skills/init-project/SKILL.md` and follow its instructions.
 
-The init-project skill will interview the user, then generate:
+The init-project skill will interview the user about scope and stack, then generate:
 
-- `AGENTS.md` (project-specific, replacing this file)
+- `AGENTS.md` (project-specific, stack-agnostic core, replacing this file)
 - `CLAUDE.md` (symlinked to `AGENTS.md` for Claude Code compatibility)
 - `.claude/agents/` with three subagent definitions (test-spec-writer, implementer, code-reviewer)
+- `.claude/hooks/quality-gate.sh` (deterministic QA gate triggered by code-reviewer)
 - `.mcp.json` with Context7 MCP server wired up for live library docs lookup
-- `docs/` with templates filled in from the interview
+- `.github/workflows/qa.yml` (CI running the quality-gate command on push and PR)
+- `.github/pull_request_template.md` (short PR checklist)
+- `.pre-commit-config.yaml` (local pre-commit hooks)
+- `docs/` with templates filled in from the interview, including `language-standards.md`
 - `.devcontainer/` if requested
-- `scripts/qa.sh` tailored to the chosen stack
-- **A working Python venv** via `uv sync` (or `npm install` for TS stacks), so the project is runnable as soon as init-project finishes. Skipped if dev container is chosen; deps install inside the container.
+- `scripts/` with the language-specific quality-gate runner
+- The chosen language's manifest file (`pyproject.toml`, `package.json`, `Cargo.toml`, etc.)
+- A working environment via the chosen package manager (`uv sync`, `pnpm install`, etc.), unless dev container is chosen
 </bootstrap-mode>
 
 <development-process>
