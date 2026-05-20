@@ -8,6 +8,30 @@
 - Bundled scripts live under `[project.scripts]` in `pyproject.toml`. The one that ships with this template is `uv run qa` (lint + format + types + tests). Add more scripts there and they become `uv run <name>`.
 </development-process>
 
+<architecture-discipline>
+These rules keep the codebase small, concrete, and easy to read. Apply them on every file you write or modify.
+
+- **Two-layer split by default.** `src/backend/` for domain logic and I/O. `src/frontend/` (or a top-level `app.py`) for UI. Add a third layer (orchestrator, flow, controller) only when a task literally cannot be expressed without one. No speculative middle layers before there is a concrete reason for them.
+
+- **One concept per file.** Each backend module owns a single concept: `llm.py`, `prompts.py`, `retriever.py`, `ingestion.py`, `tools.py`, `safety.py`, `config.py`, and so on. Target ~100 lines per file. Hard cap 200. Split before exceeding, not after.
+
+- **Prompts as Markdown files.** Store every system prompt as a `.md` file under `prompts/` (or `src/backend/prompts/`). Load them with short helpers. Substitute variables with plain string `.replace("{{placeholder}}", value)`. Do NOT build Jinja-style, Pydantic-style, or class-based prompt builders. The loader module should be under 50 lines.
+
+- **Prompt variants are files, not classes.** If you need multiple versions of the same prompt (e.g. zero-shot, few-shot, chain-of-thought, persona A, persona B), save them as separate `.md` files and switch by filename in a config value or `st.session_state` field. No strategy pattern, no registry, no factory.
+
+- **Pydantic for structured outputs only.** Use Pydantic models to validate LLM responses, define tool inputs/outputs, and capture domain models. Do NOT wrap session state in Pydantic. Do NOT model every dict that crosses a function boundary. Plain `dict[str, X]` and TypedDict are often enough.
+
+- **Session state stays plain.** In Streamlit, use the standard `if "key" not in st.session_state: st.session_state.key = default` pattern. Keep state initialization in one block at the top of the UI module. Do not introduce a session-state class.
+
+- **No premature abstraction.** Three similar lines are better than a class with a strategy pattern. The bar for adding an abstraction is "two real callers, not one hypothetical one." If you find yourself writing a base class, a registry, or a plugin system before the second concrete caller exists, stop.
+
+- **Functions over classes.** Prefer plain functions taking simple types (str, dict, list, Pydantic models for structured I/O) and returning them. Reach for a class only when state genuinely lives on the object across method calls.
+
+- **Concrete over generic.** A function that does one specific thing well is better than a function that takes a config dict and dispatches. If you find yourself writing `if mode == "X": ... elif mode == "Y": ...`, consider whether you actually want two separate functions.
+
+The test for any new module: a competent peer reading it for the first time should understand it in under one minute.
+</architecture-discipline>
+
 <global-documents>
 - `docs/structure.txt` : project map (folders, what each is for). Update when layout changes.
 - `docs/requirements.md` : what we're building, for whom, why. Domain model and stack.
